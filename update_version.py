@@ -5,7 +5,10 @@ def extract_version_from_setup(setup_path: str) -> str:
     """Extract version from setup.py."""
     with open(setup_path, "r") as f:
         content = f.read()
-    match = re.search(r"version=['\"]([0-9]+\.[0-9]+\.[0-9]+)['\"]", content)
+    
+    # Version format: version='x.x.x' or version="x.x.x.yyy where yyy is a string suffix"
+    match = re.search(r"version=['\"]([0-9]+\.[0-9]+\.[0-9]+(?:\.[a-zA-Z]+)?)['\"]", content, re.IGNORECASE)
+    
     if match:
         return match.group(1)
     raise ValueError("Version not found in setup.py")
@@ -14,7 +17,9 @@ def extract_version_from_readme(readme_path: str) -> str:
     """Extract version from README.md."""
     with open(readme_path, "r") as f:
         content = f.read()
-    match = re.search(r"python-email-sender\s+([0-9]+\.[0-9]+\.[0-9]+)", content, re.IGNORECASE)
+    
+    # Version format: version='x.x.x' or version="x.x.x.y where y is a suffix"
+    match = re.search(r"version=['\"]([0-9]+\.[0-9]+\.[0-9]+(?:\.[a-zA-Z]+)?)['\"]", content, re.IGNORECASE)
     if match:
         return match.group(1)
     raise ValueError("Version not found in README.md")
@@ -23,7 +28,10 @@ def extract_version_from_init(init_path: str) -> str:
     """Extract version from __init__.py."""
     with open(init_path, "r") as f:
         content = f.read()
-    match = re.search(r"__version__\s*=\s*['\"]([0-9]+\.[0-9]+\.[0-9]+)['\"]", content)
+    
+    # Search for the pattern "__version__ = 'x.x.x' or 'x.x.x.yyy'"
+    match = re.search(r"__version__\s*=\s*['\"]([0-9]+\.[0-9]+\.[0-9]+(?:\.[a-zA-Z]+)?)['\"]", content, re.IGNORECASE)
+    
     if match:
         return match.group(1)
     raise ValueError("Version not found in __init__.py")
@@ -105,15 +113,13 @@ def update_version(current_version: str, major: bool = False, minor: bool = Fals
         major_ver += 1
         minor_ver = 0
         patch_ver = 0
-        suffix = "a"
     elif minor:
         minor_ver += 1
         patch_ver = 0
-        suffix = "a"
     elif patch:
         patch_ver += 1
-        suffix = "a"
-    elif commit:
+    
+    if commit:
         suffix = increment_suffix(suffix)
     else:
         raise ValueError("At least one of major, minor, patch, or commit must be True")
@@ -153,7 +159,7 @@ def update_version_in_init(init_path="__init__.py", old_version=None, new_versio
 def main():
     # File paths
     setup_path = "setup.py"
-    init_path = "python-email-sender/__init__.py"
+    init_path = "python_email_sender/__init__.py"
     
     # Extract versions
     setup_version = extract_version_from_setup(setup_path)
