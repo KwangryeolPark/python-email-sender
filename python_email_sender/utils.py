@@ -5,12 +5,14 @@ from email.mime.multipart import MIMEMultipart  # 메일의 Data 영역의 메�
 from email.mime.text import MIMEText  # 메일의 본문 내용을 만드는 모듈
 from email.mime.image import MIMEImage  # 메일의 이미지 파일을 base64 형식으로 변환하기 위한 모듈
 
+home_directory = os.path.expanduser("~")
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Send Email')
     parser.add_argument('--sender', type=str, required=True, help='email sender')
     parser.add_argument('--smtp', type=str, default='smtp.gmail.com', help='smtp server')
     parser.add_argument('--receiver', type=str, required=True, help='email receiver')
-    parser.add_argument('--password', type=str, required=True, help='email password')
+    parser.add_argument('--password', type=str, required=False, help='email password', default=None)
     parser.add_argument('--title', type=str, required=True, help='email title')
     parser.add_argument('--content', type=str, required=False, help='email content', default='')
     parser.add_argument('--content_file', type=str, required=False, help='email content file', default='')
@@ -27,13 +29,23 @@ def parse_args():
         with open(args.content_file, 'r') as f:
             args.content = f.read()
         
-    if len(args.save_config) > 0:
-        os.makedirs('~/.python-email-sender', exist_ok=True)
-        with open(f'~/.python-email-sender/config', 'w') as f:
+    if len(args.save_config) > 0 and args.password is not None:
+        os.makedirs(f'{home_directory}/.python-email-sender', exist_ok=True)
+        with open(f'{home_directory}/.python-email-sender/config', 'a') as f:
             f.write(f'sender={args.sender}\n')
             f.write(f'smtp={args.smtp}\n')
             f.write(f'receiver={args.receiver}\n')
             f.write(f'password={args.password}\n')
+        print('Config file is saved at ~/.python-email-sender/config')
+    
+    if args.password is None:
+        if os.path.isfile(f'{home_directory}/.python-email-sender/config'):
+            with open(f'{home_directory}/.python-email-sender/config', 'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    key, value = line.strip().split('=')
+                    if key == 'password':
+                        args.password = value
     
     return args
 

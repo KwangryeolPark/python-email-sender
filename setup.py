@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='python-email-sender',
-    version='0.0.3.c',
+    version='0.0.4',
     description='Python package for sending email',
     author='Kwangryeol Park',
     author_email='pkr7098@gmail.com',
