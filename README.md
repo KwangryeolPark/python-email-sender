@@ -1,5 +1,5 @@
 # Python-Email-Sender
-This is a python email sender 0.0.1
+This is a python-email-sender
 
 # How to use
 ## Basic usage (Text)
@@ -48,4 +48,9 @@ email.sendmail(email_args)
 * Usage: (Shell)
 ```
 python ~~ --sender <Sender Email> --smtp <Sender SMTP Server Address> --receiver <Receiver Email> --password <Sender SMTP Password> --title <The title of the email> --content_file <Contents file path>
+```
+
+# Other options
+```
+--save_config: save configs such as sender, smtp, receiver, password at ~/.python-email-sender/config
 ```
